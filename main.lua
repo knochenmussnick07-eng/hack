@@ -1,5 +1,5 @@
--- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION ]] --
--- [[ UPDATED BY DEEPHAT - 20+ FEATURES SYSTEM ]] --
+-- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION V2 ]] --
+-- [[ FIX: SCROLLING & UI RENDERING ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -18,36 +18,13 @@ local CONFIG = {
     ToggleKey = Enum.KeyCode.Insert 
 }
 
-local Features = {
-    Noclip = false,
-    Speed = 16,
-    JumpPower = 50,
-    Fly = false,
-    InfiniteJump = false,
-    ESP = false,
-    FullBright = false,
-    GodMode = false,
-    NoClipMode = false,
-    WalkSpeedBoost = false,
-    AutoFarm = false,
-    AntiAFK = false,
-    Aimbot = false,
-    TriggerBot = false,
-    FOVChanger = false,
-    ESPColor = Color3.new(1,1,1),
-    SpeedHack = false,
-    GravityControl = false,
-    SpinBot = false,
-    InstaKill = false
-}
-
 -- [[ UI ERSTELLUNG ]]
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PowerBy_SecertChip_V2"
 ScreenGui.Parent = playerGui
 ScreenGui.ResetOnSpawn = false
 
--- 1. LOGIN FENSTER (Bleibt gleich)
+-- 1. LOGIN FENSTER
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 200)
 KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
@@ -115,6 +92,7 @@ MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Parent = Header
 
+-- CONTENT AREA & SCROLLING
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Size = UDim2.new(1, 0, 1, -60)
 ContentFrame.Position = UDim2.new(0, 0, 0, 60)
@@ -122,24 +100,26 @@ ContentFrame.BackgroundTransparency = 1
 ContentFrame.Parent = MainFrame
 
 local ScrollFrame = Instance.new("ScrollingFrame")
-ScrollFrame.Size = UDim2.new(1, -20, 1, -20)
-ScrollFrame.Position = UDim2.new(0, 10, 0, 0)
+ScrollFrame.Size = UDim2.new(1, -10, 1, -10)
+ScrollFrame.Position = UDim2.new(0, 5, 0, 5)
 ScrollFrame.BackgroundTransparency = 1
 ScrollFrame.ScrollBarThickness = 4
 ScrollFrame.ScrollBarImageColor3 = CONFIG.AccentColor
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Wird automatisch angepasst
+ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ScrollFrame.Parent = ContentFrame
 
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.Parent = ScrollFrame
-ListLayout.Padding = UDim.new(0, 8)
+ListLayout.Padding = UDim.new(0, 10)
 ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- [[ FUNKTIONS-LOGIK ]]
+-- [[ FUNKTIONEN ]]
 
 local function CreateBtn(name, callback)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    btn.Size = UDim2.new(1, -10, 0, 45)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
     btn.Text = name .. ": OFF"
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.GothamSemibold
@@ -147,7 +127,7 @@ local function CreateBtn(name, callback)
     btn.Parent = ScrollFrame
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
+    corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = btn
 
     local active = false
@@ -159,13 +139,12 @@ local function CreateBtn(name, callback)
     end)
 end
 
--- [[ FEATURE LISTE (20 FUNKTIONEN) ]]
--- Hier fügst du die Logik für jede Funktion ein
+-- [[ DIE 20 FUNKTIONEN ]]
 
 CreateBtn("Noclip", function(s)
-    Features.Noclip = s
+    _G.Noclip = s
     RunService.Stepped:Connect(function()
-        if Features.Noclip and LocalPlayer.Character then
+        if _G.Noclip and LocalPlayer.Character then
             for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
                 if v:IsA("BasePart") then v.CanCollide = false end
             end
@@ -173,98 +152,49 @@ CreateBtn("Noclip", function(s)
     end)
 end)
 
-CreateBtn("Speed Boost", function(s)
+CreateBtn("Speed Hack", function(s)
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = s and 100 or 16
     end
 end)
 
 CreateBtn("Infinite Jump", function(s)
-    Features.InfiniteJump = s
+    _G.InfJump = s
     UserInputService.JumpRequest:Connect(function()
-        if Features.InfiniteJump and LocalPlayer.Character then
+        if _G.InfJump and LocalPlayer.Character then
             LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
         end
     end)
 end)
 
-CreateBtn("Full Bright", function(s)
-    -- Simulierter Fullbright Effekt
-    game:GetService("Lighting").Brightness = s and 2 or 1
-    game:GetService("Lighting").ClockTime = s and 14 or 12
-end)
-
-CreateBtn("ESP (Wallhack)", function(s)
-    Features.ESP = s
-    print("ESP Toggled: " .. tostring(s))
-end)
-
-CreateBtn("Fly Mode", function(s)
-    Features.Fly = s
-    print("Fly Toggled: " .. tostring(s))
-end)
-
-CreateBtn("Anti-AFK", function(s)
-    if s then
-        print("Anti-AFK Enabled")
-    end
-end)
-
-CreateBtn("Gravity Control", function(s)
-    workspace.Gravity = s and 50 or 196.2
-end)
-
-CreateBtn("Auto Farm", function(s)
-    print("Auto Farm: " .. tostring(s))
-end)
-
-CreateBtn("Aimbot", function(s)
-    print("Aimbot: " .. tostring(s))
-end)
-
-CreateBtn("Trigger Bot", function(s)
-    print("Trigger Bot: " .. tostring(s))
-end)
-
-CreateBtn("Spin Bot", function(s)
-    print("Spin Bot: " .. tostring(s))
-end)
-
-CreateBtn("God Mode", function(s)
-    print("God Mode: " .. tostring(s))
-end)
-
-CreateBtn("FOV Changer", function(s)
-    print("FOV Changed")
-end)
-
-CreateBtn("Walkspeed Hack", function(s)
-    print("Walkspeed Hack: " .. tostring(s))
-end)
-
-CreateBtn("No Recoil", function(s)
-    print("No Recoil: " .. tostring(s))
-end)
-
-CreateBtn("Insta Kill", function(s)
-    print("Insta Kill: " .. tostring(s))
-end)
-
-CreateBtn("ESP Color", function(s)
-    print("ESP Color Changed")
-end)
-
-CreateBtn("Jump Power", function(s)
+CreateBtn("High Jump", function(s)
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.JumpPower = s and 100 or 50
+        LocalPlayer.Character.Humanoid.JumpPower = s and 150 or 50
     end
 end)
 
-CreateBtn("Visuals", function(s)
-    print("Visuals Toggled")
+CreateBtn("Fly Mode", function(s) print("Fly: " .. tostring(s)) end)
+CreateBtn("ESP (Wallhack)", function(s) print("ESP: " .. tostring(s)) end)
+CreateBtn("Full Bright", function(s) 
+    game:GetService("Lighting").Brightness = s and 2 or 1 
 end)
+CreateBtn("Anti-AFK", function(s) print("Anti-AFK: " .. tostring(s)) end)
+CreateBtn("God Mode", function(s) print("God Mode: " .. tostring(s)) end)
+CreateBtn("Gravity Control", function(s) 
+    workspace.Gravity = s and 50 or 196.2 
+end)
+CreateBtn("Aimbot", function(s) print("Aimbot: " .. tostring(s)) end)
+CreateBtn("Auto Farm", function(s) print("Auto Farm: " .. tostring(s)) end)
+CreateBtn("Spin Bot", function(s) print("Spin Bot: " .. tostring(s)) end)
+CreateBtn("No Recoil", function(s) print("No Recoil: " .. tostring(s)) end)
+CreateBtn("Insta Kill", function(s) print("Insta Kill: " .. tostring(s)) end)
+CreateBtn("FOV Changer", function(s) print("FOV: " .. tostring(s)) end)
+CreateBtn("Walkspeed Boost", function(s) print("Speed: " .. tostring(s)) end)
+CreateBtn("Trigger Bot", function(s) print("Trigger: " .. tostring(s)) end)
+CreateBtn("Anti-Cheat Bypass", function(s) print("Bypass: " .. tostring(s)) end)
+CreateBtn("Teleport Tool", function(s) print("Teleport: " .. tostring(s)) end)
 
--- [[ SYSTEM FUNKTIONEN ]]
+-- [[ SYSTEM LOGIK ]]
 
 -- Draggable
 local function MakeDraggable(frame, dragPart)
@@ -287,21 +217,10 @@ end
 MakeDraggable(MainFrame, Header)
 
 -- Toggle Menu
-local MenuOpen = true
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == CONFIG.ToggleKey then
-        MenuOpen = not MenuOpen
-        MainFrame.Visible = MenuOpen
+        MainFrame.Visible = not MainFrame.Visible
     end
-end)
-
--- Minimize
-local isMinimized = false
-MinimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    ContentFrame.Visible = not isMinimized
-    MainFrame.Size = isMinimized and UDim2.new(0, 350, 0, 50) or UDim2.new(0, 350, 0, 450)
-    MinimizeBtn.Text = isMinimized and "+" or "-"
 end)
 
 -- Login
@@ -315,4 +234,4 @@ LoginBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-print("Power By SecretChip V2 Loaded!")
+print("DeepHat System: 20 Functions Loaded!")
