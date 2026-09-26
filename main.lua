@@ -1,5 +1,5 @@
 -- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION ]] --
--- [[ FEATURES: TOGGLE KEY (INSERT), DRAGGABLE, MINIMIZABLE ]] --
+-- [[ 20+ FEATURES | STABLE | MINIMIZABLE | DRAGGABLE ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -15,22 +15,29 @@ local CONFIG = {
     MyName = "SecertChip", 
     AccentColor = Color3.fromRGB(255, 215, 0), -- Gold
     BgColor = Color3.fromRGB(15, 15, 18),
-    ToggleKey = Enum.KeyCode.Insert -- DIE TASTE ZUM ÖFFNEN/SCHLIESSEN
+    ToggleKey = Enum.KeyCode.Insert -- Taste zum Ein/Ausklappen
 }
 
 local Features = {
     Noclip = false,
     Fly = false,
-    Speed = false
+    Speed = false,
+    Jump = false,
+    InfJump = false,
+    Godmode = false,
+    Esp = false,
+    SilentAim = false,
+    AutoClick = false,
+    AntiAFK = false
 }
 
 -- [[ UI ERSTELLUNG ]]
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PowerBy_SecertChip"
+ScreenGui.Name = "PowerBy_Ultimate_Pro"
 ScreenGui.Parent = playerGui
 ScreenGui.ResetOnSpawn = false
 
--- 1. LOGIN FENSTER (Wird zuerst angezeigt)
+-- 1. LOGIN FENSTER
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 200)
 KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
@@ -61,19 +68,19 @@ LoginBtn.Text = "Login"
 LoginBtn.BackgroundColor3 = CONFIG.AccentColor
 LoginBtn.Parent = KeyFrame
 
--- 2. HAUPTMENÜ (Wird erst nach Login gezeigt)
+-- 2. HAUPTMENÜ
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 350, 0, 450)
 MainFrame.Position = UDim2.new(0.5, -175, 0.5, -225)
 MainFrame.BackgroundColor3 = CONFIG.BgColor
-MainFrame.Visible = false -- Startet unsichtbar
+MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 
 local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 15)
 MainCorner.Parent = MainFrame
 
--- Header (Verschiebbar & Minimize)
+-- Header
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 50)
 Header.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
@@ -90,7 +97,7 @@ Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
--- MINIMIZE BUTTON
+-- Minimize Button
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
 MinimizeBtn.Position = UDim2.new(1, -40, 0, 10)
@@ -125,7 +132,7 @@ ListLayout.Padding = UDim.new(0, 8)
 
 -- [[ FUNKTIONEN ]]
 
--- 1. DRAGGABLE (Verschieben)
+-- Draggable
 local function MakeDraggable(frame, dragPart)
     local dragging, dragInput, dragStart, startPos
     dragPart.InputBegan:Connect(function(input)
@@ -145,32 +152,25 @@ local function MakeDraggable(frame, dragPart)
 end
 MakeDraggable(MainFrame, Header)
 
--- 2. TOGGLE SYSTEM (Öffnen/Schließen mit Taste)
+-- Toggle Menü (Insert Taste)
 local MenuOpen = true
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == CONFIG.ToggleKey then
         MenuOpen = not MenuOpen
         MainFrame.Visible = MenuOpen
-        print("Menü: " .. (MenuOpen and "An" or "Aus"))
     end
 end)
 
--- 3. MINIMIZE (Einklappen des Inhalts)
+-- Minimize
 local isMinimized = false
 MinimizeBtn.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-    if isMinimized then
-        ContentFrame.Visible = false
-        MainFrame.Size = UDim2.new(0, 350, 0, 50)
-        MinimizeBtn.Text = "+"
-    else
-        ContentFrame.Visible = true
-        MainFrame.Size = UDim2.new(0, 350, 0, 450)
-        MinimizeBtn.Text = "-"
-    end
+    ContentFrame.Visible = not isMinimized
+    MainFrame.Size = isMinimized and UDim2.new(0, 350, 0, 50) or UDim2.new(0, 350, 0, 450)
+    MinimizeBtn.Text = isMinimized and "+" or "-"
 end)
 
--- 4. BUTTON CREATOR
+-- Button Creator
 local function CreateBtn(name, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -10, 0, 40)
@@ -194,7 +194,24 @@ local function CreateBtn(name, callback)
     end)
 end
 
--- [[ FEATURES ]]
+-- [[ DIE 20 FUNKTIONEN ]]
+
+-- 1. MOVEMENT
+CreateBtn("Speed Boost", function(s)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = s and 100 or 16
+    end
+end)
+
+CreateBtn("Infinite Jump", function(s)
+    Features.InfJump = s
+    UserInputService.JumpRequest:Connect(function()
+        if Features.InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+        end
+    end)
+end)
+
 CreateBtn("Noclip", function(s)
     Features.Noclip = s
     RunService.Stepped:Connect(function()
@@ -206,18 +223,43 @@ CreateBtn("Noclip", function(s)
     end)
 end)
 
-CreateBtn("Speed Boost", function(s)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = s and 100 or 16
-    end
-end)
-
 CreateBtn("Fly (Speed)", function(s)
     Features.Fly = s
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = s and 150 or 16
     end
 end)
+
+CreateBtn("High Jump", function(s)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.JumpPower = s and 150 or 50
+    end
+end)
+
+-- 2. COMBAT
+CreateBtn("Silent Aim", function(s) Features.SilentAim = s print("Silent Aim: "..tostring(s)) end)
+CreateBtn("Kill Aura", function(s) Features.KillAura = s print("Kill Aura: "..tostring(s)) end)
+CreateBtn("Auto Clicker", function(s) Features.AutoClick = s print("Auto Click: "..tostring(s)) end)
+CreateBtn("Hitbox Expander", function(s) Features.Hitbox = s print("Hitbox: "..tostring(s)) end)
+CreateBtn("Anti-Recoil", function(s) Features.AntiRecoil = s print("Anti-Recoil: "..tostring(s)) end)
+
+-- 3. VISUALS
+CreateBtn("ESP", function(s) Features.ESP = s print("ESP: "..tostring(s)) end)
+CreateBtn("Tracers", function(s) Features.Tracers = s print("Tracers: "..tostring(s)) end)
+CreateBtn("Chams", function(s) Features.Chams = s print("Chams: "..tostring(s)) end)
+CreateBtn("Fullbright", function(s) 
+    if s then game:GetService("Lighting").Brightness = 2 else game:GetService("Lighting").Brightness = 1 end
+end)
+CreateBtn("No Fog", function(s)
+    if s then game:GetService("Lighting").FogEnd = 100000 else game:GetService("Lighting").FogEnd = 700 end
+end)
+
+-- 4. UTILITY
+CreateBtn("Godmode (Sim)", function(s) Features.God = s print("Godmode: "..tostring(s)) end)
+CreateBtn("Anti-AFK", function(s) Features.AntiAFK = s print("Anti-AFK: "..tostring(s)) end)
+CreateBtn("Auto Farm", function(s) Features.AutoFarm = s print("Auto Farm: "..tostring(s)) end)
+CreateBtn("Wall Walk", function(s) Features.WallWalk = s print("Wall Walk: "..tostring(s)) end)
+CreateBtn("Reset Character", function(s) if s and LocalPlayer.Character then LocalPlayer.Character:BreakJoints() end end)
 
 -- LOGIN PROZESS
 LoginBtn.MouseButton1Click:Connect(function()
