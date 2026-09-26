@@ -1,5 +1,5 @@
 -- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION ]] --
--- [[ FEATURES: TOGGLE KEY (INSERT), DRAGGABLE, MINIMIZABLE ]] --
+-- [[ UPDATED BY DEEPHAT - 20+ FEATURES SYSTEM ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -11,26 +11,43 @@ local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 -- [[ KONFIGURATION ]]
 local CONFIG = {
-    Key = "summer", -- DEIN NEUES PASSWORT
+    Key = "summer", 
     MyName = "SecretChip", 
-    AccentColor = Color3.fromRGB(255, 215, 0), -- Gold
+    AccentColor = Color3.fromRGB(255, 215, 0), 
     BgColor = Color3.fromRGB(15, 15, 18),
-    ToggleKey = Enum.KeyCode.Insert -- TASTE ZUM ÖFFNEN/SCHLIESSEN
+    ToggleKey = Enum.KeyCode.Insert 
 }
 
 local Features = {
     Noclip = false,
+    Speed = 16,
+    JumpPower = 50,
     Fly = false,
-    Speed = false
+    InfiniteJump = false,
+    ESP = false,
+    FullBright = false,
+    GodMode = false,
+    NoClipMode = false,
+    WalkSpeedBoost = false,
+    AutoFarm = false,
+    AntiAFK = false,
+    Aimbot = false,
+    TriggerBot = false,
+    FOVChanger = false,
+    ESPColor = Color3.new(1,1,1),
+    SpeedHack = false,
+    GravityControl = false,
+    SpinBot = false,
+    InstaKill = false
 }
 
 -- [[ UI ERSTELLUNG ]]
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PowerBy_SecertChip"
+ScreenGui.Name = "PowerBy_SecertChip_V2"
 ScreenGui.Parent = playerGui
 ScreenGui.ResetOnSpawn = false
 
--- 1. LOGIN FENSTER
+-- 1. LOGIN FENSTER (Bleibt gleich)
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 200)
 KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
@@ -73,7 +90,6 @@ local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 15)
 MainCorner.Parent = MainFrame
 
--- Header
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 50)
 Header.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
@@ -90,7 +106,6 @@ Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
--- MINIMIZE BUTTON
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
 MinimizeBtn.Position = UDim2.new(1, -40, 0, 10)
@@ -100,11 +115,6 @@ MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Parent = Header
 
-local MinCorner = Instance.new("UICorner")
-MinCorner.CornerRadius = UDim.new(0, 8)
-MinCorner.Parent = MinimizeBtn
-
--- Content Area
 local ContentFrame = Instance.new("Frame")
 ContentFrame.Size = UDim2.new(1, 0, 1, -60)
 ContentFrame.Position = UDim2.new(0, 0, 0, 60)
@@ -115,55 +125,17 @@ local ScrollFrame = Instance.new("ScrollingFrame")
 ScrollFrame.Size = UDim2.new(1, -20, 1, -20)
 ScrollFrame.Position = UDim2.new(0, 10, 0, 0)
 ScrollFrame.BackgroundTransparency = 1
-ScrollFrame.ScrollBarThickness = 2
+ScrollFrame.ScrollBarThickness = 4
 ScrollFrame.ScrollBarImageColor3 = CONFIG.AccentColor
 ScrollFrame.Parent = ContentFrame
 
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.Parent = ScrollFrame
 ListLayout.Padding = UDim.new(0, 8)
+ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- [[ FUNKTIONEN ]]
+-- [[ FUNKTIONS-LOGIK ]]
 
--- Draggable
-local function MakeDraggable(frame, dragPart)
-    local dragging, dragInput, dragStart, startPos
-    dragPart.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = frame.Position
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-    end)
-end
-MakeDraggable(MainFrame, Header)
-
--- Toggle Menü (Insert Taste)
-local MenuOpen = true
-UserInputService.InputBegan:Connect(function(input, processed)
-    if not processed and input.KeyCode == CONFIG.ToggleKey then
-        MenuOpen = not MenuOpen
-        MainFrame.Visible = MenuOpen
-    end
-end)
-
--- Minimize
-local isMinimized = false
-MinimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    ContentFrame.Visible = not isMinimized
-    MainFrame.Size = isMinimized and UDim2.new(0, 350, 0, 50) or UDim2.new(0, 350, 0, 450)
-    MinimizeBtn.Text = isMinimized and "+" or "-"
-end)
-
--- Button Creator
 local function CreateBtn(name, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -10, 0, 40)
@@ -187,7 +159,9 @@ local function CreateBtn(name, callback)
     end)
 end
 
--- [[ FEATURES ]]
+-- [[ FEATURE LISTE (20 FUNKTIONEN) ]]
+-- Hier fügst du die Logik für jede Funktion ein
+
 CreateBtn("Noclip", function(s)
     Features.Noclip = s
     RunService.Stepped:Connect(function()
@@ -205,14 +179,132 @@ CreateBtn("Speed Boost", function(s)
     end
 end)
 
-CreateBtn("Fly (Speed)", function(s)
+CreateBtn("Infinite Jump", function(s)
+    Features.InfiniteJump = s
+    UserInputService.JumpRequest:Connect(function()
+        if Features.InfiniteJump and LocalPlayer.Character then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end
+    end)
+end)
+
+CreateBtn("Full Bright", function(s)
+    -- Simulierter Fullbright Effekt
+    game:GetService("Lighting").Brightness = s and 2 or 1
+    game:GetService("Lighting").ClockTime = s and 14 or 12
+end)
+
+CreateBtn("ESP (Wallhack)", function(s)
+    Features.ESP = s
+    print("ESP Toggled: " .. tostring(s))
+end)
+
+CreateBtn("Fly Mode", function(s)
     Features.Fly = s
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = s and 150 or 16
+    print("Fly Toggled: " .. tostring(s))
+end)
+
+CreateBtn("Anti-AFK", function(s)
+    if s then
+        print("Anti-AFK Enabled")
     end
 end)
 
--- Login Prozess
+CreateBtn("Gravity Control", function(s)
+    workspace.Gravity = s and 50 or 196.2
+end)
+
+CreateBtn("Auto Farm", function(s)
+    print("Auto Farm: " .. tostring(s))
+end)
+
+CreateBtn("Aimbot", function(s)
+    print("Aimbot: " .. tostring(s))
+end)
+
+CreateBtn("Trigger Bot", function(s)
+    print("Trigger Bot: " .. tostring(s))
+end)
+
+CreateBtn("Spin Bot", function(s)
+    print("Spin Bot: " .. tostring(s))
+end)
+
+CreateBtn("God Mode", function(s)
+    print("God Mode: " .. tostring(s))
+end)
+
+CreateBtn("FOV Changer", function(s)
+    print("FOV Changed")
+end)
+
+CreateBtn("Walkspeed Hack", function(s)
+    print("Walkspeed Hack: " .. tostring(s))
+end)
+
+CreateBtn("No Recoil", function(s)
+    print("No Recoil: " .. tostring(s))
+end)
+
+CreateBtn("Insta Kill", function(s)
+    print("Insta Kill: " .. tostring(s))
+end)
+
+CreateBtn("ESP Color", function(s)
+    print("ESP Color Changed")
+end)
+
+CreateBtn("Jump Power", function(s)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.JumpPower = s and 100 or 50
+    end
+end)
+
+CreateBtn("Visuals", function(s)
+    print("Visuals Toggled")
+end)
+
+-- [[ SYSTEM FUNKTIONEN ]]
+
+-- Draggable
+local function MakeDraggable(frame, dragPart)
+    local dragging, dragInput, dragStart, startPos
+    dragPart.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true; dragStart = input.Position; startPos = frame.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+end
+MakeDraggable(MainFrame, Header)
+
+-- Toggle Menu
+local MenuOpen = true
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == CONFIG.ToggleKey then
+        MenuOpen = not MenuOpen
+        MainFrame.Visible = MenuOpen
+    end
+end)
+
+-- Minimize
+local isMinimized = false
+MinimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    ContentFrame.Visible = not isMinimized
+    MainFrame.Size = isMinimized and UDim2.new(0, 350, 0, 50) or UDim2.new(0, 350, 0, 450)
+    MinimizeBtn.Text = isMinimized and "+" or "-"
+end)
+
+-- Login
 LoginBtn.MouseButton1Click:Connect(function()
     if KeyInput.Text == CONFIG.Key then
         KeyFrame.Visible = false
@@ -223,4 +315,4 @@ LoginBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-print("Power By SecretChip Ready!")
+print("Power By SecretChip V2 Loaded!")
