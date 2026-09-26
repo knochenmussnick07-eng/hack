@@ -1,5 +1,5 @@
--- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION V5 ]] --
--- [[ DEEPHAT ENGINE - FULL FUNCTIONAL CORE ]] --
+-- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION V6 ]] --
+-- [[ DEEPHAT ENGINE - CONSTANT FORCE LOGIC ]] --
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -28,16 +28,17 @@ local Settings = {
     FullBright = false,
     Spin = false,
     InfJump = false,
-    FOV = 70
+    FOV = 70,
+    WalkSpeedActive = false,
+    JumpPowerActive = false
 }
 
--- [[ UI ERSTELLUNG ]]
+-- [[ UI ERSTELLUNG (Bleibt gleich für Stabilität) ]]
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PowerBy_SecertChip_V5"
+ScreenGui.Name = "PowerBy_SecertChip_V6"
 ScreenGui.Parent = playerGui
 ScreenGui.ResetOnSpawn = false
 
--- 1. LOGIN FENSTER
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0, 300, 0, 200)
 KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
@@ -68,17 +69,12 @@ LoginBtn.Text = "Login"
 LoginBtn.BackgroundColor3 = CONFIG.AccentColor
 LoginBtn.Parent = KeyFrame
 
--- 2. HAUPTMENÜ
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 350, 0, 450)
 MainFrame.Position = UDim2.new(0.5, -175, 0.5, -225)
 MainFrame.BackgroundColor3 = CONFIG.BgColor
 MainFrame.Visible = false 
 MainFrame.Parent = ScreenGui
-
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 15)
-MainCorner.Parent = MainFrame
 
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 50)
@@ -141,59 +137,71 @@ local function CreateBtn(name, callback)
     end)
 end
 
--- [[ ECHTE LOGIK IMPLEMENTIERUNG ]]
+-- [[ DIE FIX-LOGIK (CONSTANT LOOP) ]]
 
--- 1. NOCLIP (Durch Wände gehen)
-CreateBtn("Noclip", function(s)
-    Settings.Noclip = s
-    RunService.Stepped:Connect(function()
-        if Settings.Noclip and LocalPlayer.Character then
-            for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
-                if v:IsA("BasePart") then 
-                    v.CanCollide = false 
-                end
+-- Diese Schleife läuft 60x pro Sekunde und erzwingt die Werte!
+RunService.Heartbeat:Connect(function()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+
+    -- 1. Speed Hack (Constant Force)
+    if Settings.WalkSpeedActive and hum then
+        hum.WalkSpeed = Settings.Speed
+    end
+
+    -- 2. Noclip (Constant Collision Disable)
+    if Settings.Noclip then
+        for _, v in pairs(char:GetDescendants()) do
+            if v:IsA("BasePart") then 
+                v.CanCollide = false 
             end
         end
-    end)
-end)
+    end
 
--- 2. SPEED HACK
-CreateBtn("Speed Hack", function(s)
-    Settings.Speed = s and 100 or 16
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChild("Humanoid") then
-        char.Humanoid.WalkSpeed = Settings.Speed
+    -- 3. Jump Power (Constant Force)
+    if Settings.JumpPowerActive and hum then
+        hum.JumpPower = Settings.JumpPower
+        hum.UseJumpPower = true
+    end
+
+    -- 4. Spin Bot (Constant Rotation)
+    if Settings.Spin and root then
+        root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(25), 0)
     end
 end)
 
--- 3. INFINITY JUMP
+-- [[ FUNKTIONEN BUTTONS ]]
+
+CreateBtn("Speed Hack", function(s)
+    Settings.WalkSpeedActive = s
+    Settings.Speed = s and 100 or 16
+end)
+
+CreateBtn("Noclip", function(s)
+    Settings.Noclip = s
+end)
+
+CreateBtn("High Jump", function(s)
+    Settings.JumpPowerActive = s
+    Settings.JumpPower = s and 150 or 50
+end)
+
 CreateBtn("Infinity Jump", function(s)
     Settings.InfJump = s
     UserInputService.JumpRequest:Connect(function()
         if Settings.InfJump and LocalPlayer.Character then
             local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            if hum then
-                hum:ChangeState("Jumping")
-            end
+            if hum then hum:ChangeState("Jumping") end
         end
     end)
 end)
 
--- 4. HIGH JUMP
-CreateBtn("High Jump", function(s)
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChild("Humanoid") then
-        char.Humanoid.JumpPower = s and 150 or 50
-        char.Humanoid.UseJumpPower = true
-    end
-end)
-
--- 5. LOW GRAVITY
 CreateBtn("Low Gravity", function(s)
     workspace.Gravity = s and 50 or 196.2
 end)
 
--- 6. FULL BRIGHT
 CreateBtn("Full Bright", function(s)
     Settings.FullBright = s
     if s then
@@ -205,31 +213,21 @@ CreateBtn("Full Bright", function(s)
     end
 end)
 
--- 7. FOV (Field of View)
 CreateBtn("FOV Changer", function(s)
     local targetFOV = s and 110 or 70
     TweenService:Create(workspace.CurrentCamera, TweenInfo.new(1), {FieldOfView = targetFOV}):Play()
 end)
 
--- 8. SPIN BOT
 CreateBtn("Spin Bot", function(s)
     Settings.Spin = s
-    RunService.RenderStepped:Connect(function()
-        if Settings.Spin and LocalPlayer.Character then
-            local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if root then
-                root.CFrame = root.CFrame * CFrame.Angles(0, math.rad(25), 0)
-            end
-        end
-    end)
 end)
 
--- [[ ÜBRIGE FUNKTIONEN (Platzhalter für Erweiterung) ]]
+-- [[ RESTLICHE BUTTONS ]]
 CreateBtn("Anti-AFK", function(s) print("Anti-AFK: ", s) end)
-CreateBtn("God Mode", function(s) print("God Mode: ", s) end)
+CreateBtn("God Mode", function(s) print("God: ", s) end)
 CreateBtn("ESP", function(s) print("ESP: ", s) end)
 CreateBtn("Aimbot", function(s) print("Aimbot: ", s) end)
-CreateBtn("Auto Farm", function(s) print("Auto Farm: ", s) end)
+CreateBtn("Auto Farm", function(s) print("Farm: ", s) end)
 CreateBtn("Walkspeed Boost", function(s) print("WS: ", s) end)
 CreateBtn("Trigger Bot", function(s) print("Trigger: ", s) end)
 CreateBtn("No Recoil", function(s) print("Recoil: ", s) end)
@@ -260,7 +258,7 @@ local function MakeDraggable(frame, dragPart)
 end
 MakeDraggable(MainFrame, Header)
 
--- Toggle Menu
+-- Toggle Menü
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == CONFIG.ToggleKey then
         MainFrame.Visible = not MainFrame.Visible
@@ -278,4 +276,4 @@ LoginBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-print("DeepHat V5: Core Engine Fully Functional!")
+print("DeepHat V6: CONSTANT FORCE ENGINE LOADED!")
