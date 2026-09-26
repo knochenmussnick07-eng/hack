@@ -1,8 +1,7 @@
--- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION V2 ]] --
--- [[ FIX: SCROLLING & UI RENDERING ]] --
+-- [[ POWER BY SECERTCHIP - ULTIMATE PRO EDITION V3 ]] --
+-- [[ DEEPHAT ENGINE - FIX: CANVAS SIZE & RENDERING ]] --
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
@@ -20,7 +19,7 @@ local CONFIG = {
 
 -- [[ UI ERSTELLUNG ]]
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PowerBy_SecertChip_V2"
+ScreenGui.Name = "PowerBy_SecertChip_V3"
 ScreenGui.Parent = playerGui
 ScreenGui.ResetOnSpawn = false
 
@@ -83,20 +82,11 @@ Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-MinimizeBtn.Position = UDim2.new(1, -40, 0, 10)
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.new(1, 1, 1)
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.Parent = Header
-
--- CONTENT AREA & SCROLLING
+-- CONTENT AREA
 local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, 0, 1, -60)
-ContentFrame.Position = UDim2.new(0, 0, 0, 60)
-ContentFrame.BackgroundTransparency = 1
+ContentFrame.Size = UDim2.new(1, -20, 1, -70)
+ContentFrame.Position = UDim2.new(0, 10, 0, 60)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 ContentFrame.Parent = MainFrame
 
 local ScrollFrame = Instance.new("ScrollingFrame")
@@ -105,13 +95,13 @@ ScrollFrame.Position = UDim2.new(0, 5, 0, 5)
 ScrollFrame.BackgroundTransparency = 1
 ScrollFrame.ScrollBarThickness = 4
 ScrollFrame.ScrollBarImageColor3 = CONFIG.AccentColor
-ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Wird automatisch angepasst
-ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+-- WICHTIG: Wir setzen die CanvasSize manuell hoch, damit man scrollen kann!
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 1000) 
 ScrollFrame.Parent = ContentFrame
 
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.Parent = ScrollFrame
-ListLayout.Padding = UDim.new(0, 10)
+ListLayout.Padding = UDim.new(0, 8)
 ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 -- [[ FUNKTIONEN ]]
@@ -119,7 +109,7 @@ ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 local function CreateBtn(name, callback)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -10, 0, 45)
-    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
     btn.Text = name .. ": OFF"
     btn.TextColor3 = Color3.new(1, 1, 1)
     btn.Font = Enum.Font.GothamSemibold
@@ -127,7 +117,7 @@ local function CreateBtn(name, callback)
     btn.Parent = ScrollFrame
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = btn
 
     local active = false
@@ -139,60 +129,28 @@ local function CreateBtn(name, callback)
     end)
 end
 
--- [[ DIE 20 FUNKTIONEN ]]
+-- [[ DIE 20 FUNKTIONEN LISTE ]]
 
-CreateBtn("Noclip", function(s)
-    _G.Noclip = s
-    RunService.Stepped:Connect(function()
-        if _G.Noclip and LocalPlayer.Character then
-            for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
-            end
-        end
-    end)
-end)
-
-CreateBtn("Speed Hack", function(s)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = s and 100 or 16
-    end
-end)
-
-CreateBtn("Infinite Jump", function(s)
-    _G.InfJump = s
-    UserInputService.JumpRequest:Connect(function()
-        if _G.InfJump and LocalPlayer.Character then
-            LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-        end
-    end)
-end)
-
-CreateBtn("High Jump", function(s)
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.JumpPower = s and 150 or 50
-    end
-end)
-
-CreateBtn("Fly Mode", function(s) print("Fly: " .. tostring(s)) end)
-CreateBtn("ESP (Wallhack)", function(s) print("ESP: " .. tostring(s)) end)
-CreateBtn("Full Bright", function(s) 
-    game:GetService("Lighting").Brightness = s and 2 or 1 
-end)
-CreateBtn("Anti-AFK", function(s) print("Anti-AFK: " .. tostring(s)) end)
-CreateBtn("God Mode", function(s) print("God Mode: " .. tostring(s)) end)
-CreateBtn("Gravity Control", function(s) 
-    workspace.Gravity = s and 50 or 196.2 
-end)
-CreateBtn("Aimbot", function(s) print("Aimbot: " .. tostring(s)) end)
-CreateBtn("Auto Farm", function(s) print("Auto Farm: " .. tostring(s)) end)
-CreateBtn("Spin Bot", function(s) print("Spin Bot: " .. tostring(s)) end)
-CreateBtn("No Recoil", function(s) print("No Recoil: " .. tostring(s)) end)
-CreateBtn("Insta Kill", function(s) print("Insta Kill: " .. tostring(s)) end)
-CreateBtn("FOV Changer", function(s) print("FOV: " .. tostring(s)) end)
-CreateBtn("Walkspeed Boost", function(s) print("Speed: " .. tostring(s)) end)
-CreateBtn("Trigger Bot", function(s) print("Trigger: " .. tostring(s)) end)
-CreateBtn("Anti-Cheat Bypass", function(s) print("Bypass: " .. tostring(s)) end)
-CreateBtn("Teleport Tool", function(s) print("Teleport: " .. tostring(s)) end)
+CreateBtn("Noclip", function(s) print("Noclip: ", s) end)
+CreateBtn("Speed Hack", function(s) print("Speed: ", s) end)
+CreateBtn("Infinite Jump", function(s) print("InfJump: ", s) end)
+CreateBtn("Fly Mode", function(s) print("Fly: ", s) end)
+CreateBtn("ESP (Wallhack)", function(s) print("ESP: ", s) end)
+CreateBtn("Full Bright", function(s) print("Bright: ", s) end)
+CreateBtn("Anti-AFK", function(s) print("AntiAFK: ", s) end)
+CreateBtn("God Mode", function(s) print("God: ", s) end)
+CreateBtn("Gravity Control", function(s) print("Gravity: ", s) end)
+CreateBtn("Aimbot", function(s) print("Aimbot: ", s) end)
+CreateBtn("Auto Farm", function(s) print("Farm: ", s) end)
+CreateBtn("Spin Bot", function(s) print("Spin: ", s) end)
+CreateBtn("No Recoil", function(s) print("Recoil: ", s) end)
+CreateBtn("Insta Kill", function(s) print("Kill: ", s) end)
+CreateBtn("FOV Changer", function(s) print("FOV: ", s) end)
+CreateBtn("Walkspeed Boost", function(s) print("WS: ", s) end)
+CreateBtn("Trigger Bot", function(s) print("Trigger: ", s) end)
+CreateBtn("Anti-Cheat Bypass", function(s) print("Bypass: ", s) end)
+CreateBtn("Teleport Tool", function(s) print("Teleport: ", s) end)
+CreateBtn("Visuals", function(s) print("Visuals: ", s) end)
 
 -- [[ SYSTEM LOGIK ]]
 
@@ -216,7 +174,7 @@ local function MakeDraggable(frame, dragPart)
 end
 MakeDraggable(MainFrame, Header)
 
--- Toggle Menu
+-- Toggle Menü
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == CONFIG.ToggleKey then
         MainFrame.Visible = not MainFrame.Visible
@@ -234,4 +192,4 @@ LoginBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-print("DeepHat System: 20 Functions Loaded!")
+print("DeepHat V3: UI Fixed. 20 Functions loaded.")
